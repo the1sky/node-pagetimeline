@@ -6,6 +6,8 @@
 module.exports = function(data) {
     var asserts = {},
         generator = '',
+        rawData,
+        filterData = [],
         metrics = {},
         offenders = {},
         url;
@@ -15,11 +17,26 @@ module.exports = function(data) {
         generator = data.generator;
         metrics = data.metrics;
         offenders = data.offenders;
+        rawData = data.rawData;
+        filterData = data.filterData;
         url = data.url;
     }
 
     // public API
     return {
+        //raw
+        getRawData:function(){
+            return rawData;
+        },
+        setRawData:function(data){
+            rawData = data;
+        },
+        getFilterData:function(){
+            return filterData;
+        },
+        setFilterData:function(data){
+            filterData = data;
+        },
         // metrics
         setMetric: function(name, value) {
             metrics[name] = value;
