@@ -12,10 +12,5 @@ module.exports = function(results, format) {
 		throw 'formatter: format "' + format + '" is not supported!';
 	}
 
-	function render() {
-		return formatter.render();
-	}
-
-	// public interface
-	this.render = render;
+    return formatter.render();
 };

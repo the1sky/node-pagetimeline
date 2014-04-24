@@ -3,5 +3,9 @@
  */
 exports.version = '0.1.0';
 exports.module = function(timeline){
-    timeline.setMetric('hotspot', 'hotspotResult');
+    timeline.setMetric('hotspot', 3);
+
+    timeline.addOffender('hotspot','http://www.baidu.com');
+    timeline.addOffender('hotspot','http://www.baidu.com/logo.gif');
+    timeline.addOffender('hotspot','http://www.baidu.com/test.js');
 }

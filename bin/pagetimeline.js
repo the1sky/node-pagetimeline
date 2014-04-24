@@ -66,7 +66,7 @@ options = program.parse(process.argv);
 
 // show version number
 if (options.version === true) {
-	console.log('phantomas v%s', phantomas.version);
+	console.log('pagetimeline v%s', timeline.version);
 	process.exit(0);
 }
 
@@ -97,14 +97,24 @@ timelineChild.on('error',function(code){
     console.log('error');
 });
 
+/*
 timelineChild.on('results',function(res){
     printTitle();
-    console.log( res.getFilterData() );
-    console.log(res.getMetrics() );
+
+    process.stdout.write( new Buffer( res.getMetrics() ) );
+    console.log( res.getMetrics() );
+    console.log( res.getAllOffenders() );
     process.stdout.write(new Buffer( res ) );
+});
+*/
+
+timelineChild.on('report',function(res){
+    printTitle();
+    process.stdout.write( new Buffer( res ) );
     normalExit();
 });
 
+/*
 // spawn phantomas process
 phantomasChild = phantomas(url, options);
 
@@ -121,6 +131,7 @@ phantomasChild.on('results', function (res) {
 phantomasChild.on('error', function (code) {
 	process.exit(code);
 });
+*/
 
 function formatTimelineResult(result){
     var format = options.format;
