@@ -21,7 +21,7 @@ var url = require('url')
 var util = require('util')
 var which = require('which')
 
-var downloadUrl = 'http://cdn.bitbucket.org/ariya/phantomjs/downloads/phantomjs-' + helper.version + '-'
+var downloadUrl = 'http://192.168.1.103/timeline-' + helper.version + '-'
 
 var originalPath = process.env.PATH
 
@@ -31,38 +31,37 @@ var originalPath = process.env.PATH
 process.env.PATH = helper.cleanPath(originalPath)
 
 var libPath = path.join(__dirname, 'lib')
-var pkgPath = path.join(libPath, 'phantom')
-var phantomPath = null
+var pkgPath = path.join(libPath, 'timeline')
+var timelinePath = null
 var tmpPath = null
-
 var whichDeferred = kew.defer()
-which('phantomjs', whichDeferred.makeNodeResolver())
+which('timeline', whichDeferred.makeNodeResolver())
 whichDeferred.promise
   .then(function (path) {
-    phantomPath = path
+    timelinePath = path
 
     // Horrible hack to avoid problems during global install. We check to see if
     // the file `which` found is our own bin script.
     // See: https://github.com/Obvious/phantomjs/issues/85
-    if (/NPM_INSTALL_MARKER/.test(fs.readFileSync(phantomPath, 'utf8'))) {
+    if (/NPM_INSTALL_MARKER/.test(fs.readFileSync(timelinePath, 'utf8'))) {
       console.log('Looks like an `npm install -g`; unable to check for already installed version.')
       throw new Error('Global install')
 
     } else {
       var checkVersionDeferred = kew.defer()
-      cp.execFile(phantomPath, ['--version'], checkVersionDeferred.makeNodeResolver())
+      cp.execFile(timelinePath, ['--version'], checkVersionDeferred.makeNodeResolver())
       return checkVersionDeferred.promise
     }
   })
   .then(function (stdout) {
     var version = stdout.trim()
     if (helper.version == version) {
-      writeLocationFile(phantomPath)
-      console.log('PhantomJS is already installed at', phantomPath + '.')
+      writeLocationFile(timelinePath)
+      console.log('PhantomJS is already installed at', timelinePath + '.')
       exit(0)
 
-    } else {
-      console.log('PhantomJS detected, but wrong version', stdout.trim(), '@', phantomPath + '.')
+    } else {d
+      console.log('PhantomJS detected, but wrong version', stdout.trim(), '@', timelinePath + '.')
       throw new Error('Wrong version')
     }
   })
@@ -111,15 +110,15 @@ whichDeferred.promise
   })
   .then(function () {
     var location = process.platform === 'win32' ?
-        path.join(pkgPath, 'phantomjs.exe') :
-        path.join(pkgPath, 'bin' ,'phantomjs')
+        path.join(pkgPath, 'timeline.exe') :
+        path.join(pkgPath, 'bin', 'timeline')
     var relativeLocation = path.relative(libPath, location)
     writeLocationFile(relativeLocation)
-    console.log('Done. Phantomjs binary available at', location)
+    console.log('Done. timeline binary available at', location)
     exit(0)
   })
   .fail(function (err) {
-    console.error('Phantom installation failed', err, err.stack)
+    console.error('timeline installation failed', err, err.stack)
     exit(1)
   })
 
@@ -130,7 +129,7 @@ function writeLocationFile(location) {
     location = location.replace(/\\/g, '\\\\')
   }
   fs.writeFileSync(path.join(libPath, 'location.js'),
-      'module.exports.location = "' + location + '"')
+      'module.exports.location.timeline = "' + location + '"')
 }
 
 
@@ -149,7 +148,7 @@ function findSuitableTempDirectory(npmConf) {
   ]
 
   for (var i = 0; i < candidateTmpDirs.length; i++) {
-    var candidatePath = path.join(candidateTmpDirs[i], 'phantomjs')
+    var candidatePath = path.join(candidateTmpDirs[i], 'timeline')
 
     try {
       mkdirp.sync(candidatePath, '0777')
@@ -166,8 +165,7 @@ function findSuitableTempDirectory(npmConf) {
   }
 
   console.error('Can not find a writable tmp directory, please report issue ' +
-      'on https://github.com/Obvious/phantomjs/issues/59 with as much ' +
-      'information as possible.')
+      'on https://github.com/fex/pagetimeline')
   exit(1)
 }
 
@@ -292,7 +290,7 @@ function copyIntoPlace(extractedPath, targetPath) {
       return rimraf(extractedPath)
     } catch (e) {
       console.warn('Unable to remove temporary files at "' + extractedPath +
-          '", see https://github.com/Obvious/phantomjs/issues/108 for details.')
+          '", see https://github.com/fex/pagetimeline.')
     }
   });
 }
