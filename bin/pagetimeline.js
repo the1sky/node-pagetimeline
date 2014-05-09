@@ -17,7 +17,7 @@ var phantomas = require('phantomas'),
 	options = {},
 	program,
     count=0,
-    total= 1,
+    total= 2,
 	url = '';
 
 // parse options
@@ -120,7 +120,8 @@ phantomasChild = phantomas(url, options);
 
 // pass raw results
 phantomasChild.on('results', function (res) {
-    process.stdout.write( res );
+    console.log( res.getMetrics() );
+    //process.stdout.write( new Buffer( res ) );
     normalExit();
 });
 

@@ -21,7 +21,7 @@ var url = require('url')
 var util = require('util')
 var which = require('which')
 
-var downloadUrl = 'http://192.168.1.103/timeline-' + helper.version + '-'
+var downloadUrl = 'http://fe.baidu.com/pagetimeline/tools/timeline-' + helper.version + '-'
 
 var originalPath = process.env.PATH
 
