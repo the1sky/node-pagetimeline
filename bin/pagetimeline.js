@@ -10,10 +10,6 @@ var phantomas = require('phantomas'),
     timeline = require('./../lib/timeline'),
 	program = require('optimist'),
     os = require('os'),
-	phantomasChild,
-    phantomasRes,
-    timelineChild,
-    timelineRes,
 	options = {},
 	program,
     count=0,
@@ -84,6 +80,7 @@ if (typeof options.url !== 'string' && typeof options.config === 'undefined') {
 
 url = options.url;
 delete options.url;
+
 delete options._;
 delete options.$0;
 
@@ -91,57 +88,63 @@ delete options.$0;
 options['no-externals'] = options.externals === false;
 delete options.externals;
 
-timelineChild = timeline(url,options);
+var Results = require('./../core/results');
+var results = new Results();
+results.setGenerator('pagetimeline v' + require('./../package').version + ':\r\n' );
+results.setUrl( url );
+
+
+var timelineChild = timeline(url,options);
+
+if( timelineChild.code != 0 ){
+   total--;
+}
 
 timelineChild.on('error',function(code){
-    console.log('error');
-    normalExit();
 });
 
-/*
 timelineChild.on('results',function(res){
-    printTitle();
-
-    process.stdout.write( new Buffer( res.getMetrics() ) );
-    console.log( res.getMetrics() );
-    console.log( res.getAllOffenders() );
-    process.stdout.write(new Buffer( res ) );
-});
-*/
-
-timelineChild.on('report',function(res){
-    printTitle();
-    process.stdout.write( new Buffer( res ) );
+    mergeResult(res);
     normalExit();
 });
 
 // spawn phantomas process
-phantomasChild = phantomas(url, options);
+var phantomasChild = phantomas(url, options);
 
 // pass raw results
 phantomasChild.on('results', function (res) {
-    console.log( res.getMetrics() );
-    //process.stdout.write( new Buffer( res ) );
+    mergeResult(res);
     normalExit();
 });
 
 // pass exit code
 phantomasChild.on('error', function (code) {
-	process.exit(code);
+    total--;
 });
 
-function getTitle(){
-    var moduleName = require('../package').name;
-    var version = require('../package').version;
-    return moduleName + ' ' + version + ':\r\n';
-}
-
-function printTitle(){
-    if( count++ == 0 ){
-        process.stdout.write( getTitle() );
+function normalExit(){
+    if( ++count == total){
+        process.stdout.write(new Buffer( report(results)));
+        process.exit(0);
     }
 }
 
-function normalExit(){
-    if( count == total) process.exit(0);
+function mergeResult(res){
+    var metrics = res.getMetrics();
+    var offenders = res.getAllOffenders();
+    for( var key in metrics ){
+        results.setMetric(key,metrics[key]);
+    }
+    for( key in offenders ){
+        var offenderValue = offenders[key];
+        for( var index in offenderValue ){
+            results.addOffender(key, offenderValue[index]);
+        }
+    }
+}
+
+function report(results) {
+    // emit results in JSON
+    var formatter = require('./../core/formatter');
+    return formatter(results, options.format);
 }
